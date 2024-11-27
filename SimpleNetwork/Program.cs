@@ -1,5 +1,5 @@
 ﻿
-using SimpleNetwork;
+using TicTacToe;
 
 Console.WriteLine("Program Started.");
 
