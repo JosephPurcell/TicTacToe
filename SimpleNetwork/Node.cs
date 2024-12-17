@@ -8,38 +8,52 @@ namespace TicTacToe
 {
     public class Node
     {
+        //Function to get random number
+        private static readonly Random getrandom = new Random();
+
+        public static double GetRandomNumber(double min = 0)
+        {
+            lock (getrandom) // synchronize
+            {
+                double random = getrandom.NextDouble();
+
+                return getrandom.NextDouble() * (1.0 - min) + min;
+            }
+        }
+
         public Node(Func<double, double> sigmoid, double result = 0)
         {
             Sigmoid = sigmoid;
             Result = result;
         }
 
-        public Dictionary<Node, double> InputNodes = new Dictionary<Node, double>();
+        public Dictionary<Node, double> ForwardNodes = new Dictionary<Node, double>();
 
         public double Result { get; set; }
 
+        public double Bias { get; set; }
+
+        public double Error { get; set;  }
         public Func<double, double> Sigmoid { get; set; }
 
-        public void AddInputNode(Node node)
+        public void AddForwardNode(Node node)
         {
-            InputNodes.Add(node, 0.00001);
+            ForwardNodes.Add(node, GetRandomNumber());
         }
 
-        public void CalcNode()
+        public void CalcNode(int nodeCount = 9)
         {
-            foreach(var valuePair in InputNodes)
+            Result = Sigmoid(Result/ nodeCount);
+            if (double.IsNaN(Result) || double.IsInfinity(Result) || double.IsNegativeInfinity(Result))
+            {
+                throw new Exception("Bad result!");
+            }
+            foreach (var valuePair in ForwardNodes)
             {
                 var node = valuePair.Key;
                 var weight = valuePair.Value;
-                Result += node.Sigmoid(weight*node.Result);
-
-                if(double.IsNaN(Result) || double.IsInfinity(Result) || double.IsNegativeInfinity(Result))
-                {
-                    throw new Exception("Bad result!");
-                }
+                node.Result += weight * Result;
             }
-
-            Result = Result / Math.Max(1,InputNodes.Count);
         }
     }
 }

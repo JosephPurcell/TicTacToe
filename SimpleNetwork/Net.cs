@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TicTacToe
 {
@@ -11,26 +12,26 @@ namespace TicTacToe
         public Net(int inputSize, int outputSize, int depth)
         {
             // Input layer
-            var layer1 = new Layer(inputSize+2);
+            var layer1 = new Layer(inputSize,0);
             Layers.Add(layer1);
 
             // Middle layers
             for(int i = 0; i < depth; i++) 
             {
-                var middleLayer = new Layer(3);
+                var middleLayer = new Layer(inputSize,0);
                 Layers.Add(middleLayer);
             }
 
             // Output layer
-            var outputLayer = new Layer(outputSize);
+            var outputLayer = new Layer(outputSize,0);
             Layers.Add(outputLayer);
 
             // Link layers...
-            for (int i = 1; i < Layers.Count; i++)
+            for (int i = 0; i < Layers.Count - 1; i++)
             {
-                var lastLayer = Layers[i - 1];
-                var nextLayer = Layers[i];
-                lastLayer.LinkLayer(nextLayer);
+                var thisLayer = Layers[i];
+                var nextLayer = Layers[i+1];
+                thisLayer.LinkLayer(nextLayer);
             }
         }
 
@@ -41,8 +42,6 @@ namespace TicTacToe
             // Load inputs first
             var firstLayer = Layers[0];
             var localInputs = new List<double>(inputs);
-            localInputs.Add(-1);
-            localInputs.Add(1);
             for(int i = 0; i < localInputs.Count; i++)
             {
                 firstLayer.Nodes[i].Result = localInputs[i];
@@ -58,71 +57,103 @@ namespace TicTacToe
 
             var results = lastLayer.Nodes.Select(x => x.Result).ToList();
 
-            // Clear all results
-            foreach(var layer in Layers)
-            {
-                foreach(var node in layer.Nodes)
-                {
-                    node.Result = 0;
-                }
-            }
-
             return results;
         }
 
-        public void Train(List<Trainer> trainingData, double acceptableScore)
+        //public void Train(List<Trainer> trainingData, double acceptableScore)
+        //{
+        //    Random r = new Random(17);
+        //    while (true)
+        //    {
+        //        var layers = Layers[0..];
+        //        foreach (var layer in layers)
+        //        {
+        //            foreach (var node in layer.Nodes)
+        //            {
+        //                foreach (var key in node.InputNodes.Keys)
+        //                {
+        //                    var originalScore = GetScore(trainingData);
+        //                    var originalValue = node.InputNodes[key];
+        //                    node.InputNodes[key] += r.NextDouble() < 0.5 ? -1* r.NextDouble() * 10 : r.NextDouble()* 10;
+        //                    var newScore = GetScore(trainingData);
+
+        //                    // Less is a better score!
+        //                    if(newScore < originalScore)
+        //                    {
+        //                        Console.WriteLine("Improved node!");
+        //                    }
+        //                    else
+        //                    {
+        //                        // Set value back to original value
+        //                        node.InputNodes[key] = originalValue;
+        //                    }
+        //                }
+        //            }
+        //        }
+
+        //        var score = GetScore(trainingData);
+        //        Console.WriteLine($"Scored: {score}");
+
+        //        if(score < acceptableScore)
+        //        {
+        //            Console.WriteLine("Training passed!");
+        //            return;
+        //        }
+        //    }
+        //}
+
+        public double Play(List<int> board)
         {
-            Random r = new Random(17);
-            while (true)
+            // clear last results
+            foreach (var layer in Layers)
             {
-                var layers = Layers[0..];
-                foreach (var layer in layers)
-                {
-                    foreach (var node in layer.Nodes)
-                    {
-                        foreach (var key in node.InputNodes.Keys)
-                        {
-                            var originalScore = GetScore(trainingData);
-                            var originalValue = node.InputNodes[key];
-                            node.InputNodes[key] += r.NextDouble() < 0.5 ? -1* r.NextDouble() * 10 : r.NextDouble()* 10;
-                            var newScore = GetScore(trainingData);
+                layer.ClearResults();
+            }
 
-                            // Less is a better score!
-                            if(newScore < originalScore)
-                            {
-                                Console.WriteLine("Improved node!");
-                            }
-                            else
-                            {
-                                // Set value back to original value
-                                node.InputNodes[key] = originalValue;
-                            }
-                        }
-                    }
-                }
+            List<double> inputs = new List<double>();
+            for (int i = 0; i < board.Count; i++)
+            {
+                inputs.Add(board[i]);
+            }
+            var results = this.GetResults(inputs);
+            return results[0];
+        }
 
-                var score = GetScore(trainingData);
-                Console.WriteLine($"Scored: {score}");
-
-                if(score < acceptableScore)
-                {
-                    Console.WriteLine("Training passed!");
-                    return;
-                }
+        public void BackPropagate(List<double> errors)
+        {
+            var lastLayer = Layers.Last();
+            for (int i = 0; i < lastLayer.Nodes.Count; i++)
+            {
+                lastLayer.Nodes[i].Error = errors[i];
+            }
+            for (int i = Layers.Count - 2; i >0; i--)
+            {
+                Layers[i].BackPropagate();
             }
         }
 
-        public double GetScore(List<Trainer> trainingData)
+
+        public double GetScore(List<double> inputData)
         {
-            var score = 0.0;
-            foreach(var simulant in trainingData)
+            // clear last results
+            foreach (var layer in Layers)
             {
-                var results = this.GetResults(simulant.Inputs);
-                for (int i = 0; i < results.Count; i++)
+                layer.ClearResults();
+            }
+
+            // apply inputs and process
+            var score = 0.0;
+            for(int i=0; i<9; i++)
+            {
+                Layers[0].Nodes[i].Result = inputData[i];
+            }
+
+            for(int i=0; i<Layers.Count-1; i++)
+            {
+                var layer = Layers[i];
+                foreach(var node in layer.Nodes)
                 {
-                    var wantedOutput = simulant.WantedOutputs[i];
-                    var actualOutput = results[i];
-                    score += Math.Abs(wantedOutput - actualOutput);
+                    node.CalcNode();
                 }
             }
             return score;
