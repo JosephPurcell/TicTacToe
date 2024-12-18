@@ -9,23 +9,37 @@ namespace TicTacToe
     public class Layer
     {
         int Width { get; set; } = 0;
-        public Layer(int width, int Bias)
+        public Layer(int width, int Bias, bool inputLayer = false)
         {
             Width = width;
             for (int i = 0; i < width; i++) 
             {
-                Nodes.Add(new Node((double input) =>
+                if (inputLayer)
                 {
-                    // Mathematical sigmoid function
-                    return (1 / (1 + Math.Pow(Math.E, -1 * input)));
-                }));
+                    Nodes.Add(new InputNode((double input) =>
+                    {
+                        // Mathematical sigmoid function
+                        return (1 / (1 + Math.Pow(Math.E, -1 * input)));
+                    }));
+                }
+                else
+                {
+                    Nodes.Add(new Node((double input) =>
+                    {
+                        // Mathematical sigmoid function
+                        return (1 / (1 + Math.Pow(Math.E, -1 * input)));
+                    }));
+                }
             }
 
+            // could just make these nodes part of the Nodes<> list but it is
+            // easier to set a breakpoint on them this way or change the activation
+            // function for biases only
             int bias = -1;
             for (int i = 0; i < Bias; i++)
             {
                 bias = bias * -1;
-                BiasInputs.Add(new Node((double input) =>
+                BiasInputs.Add(new BiasNode((double input) =>
                 {
                     // Mathematical sigmoid function
                     return (1 / (1 + Math.Pow(Math.E, -1 * input)));
@@ -38,51 +52,29 @@ namespace TicTacToe
 
         public List<Node> BiasInputs { get; set; } = new List<Node>();
 
-        public void CalcLayer()
+        public void CalcLayer(int previousLayerNodeCount)
         {
             foreach (var node in Nodes)
             {
-                node.CalcNode(Nodes.Count + BiasInputs.Count);
+                node.CalcNode(previousLayerNodeCount);
             }
 
             foreach (var node in BiasInputs)
             {
-                node.Result = node.Bias;
-                node.CalcNode(Nodes.Count + BiasInputs.Count);
+                node.CalcNode();
             }
         }
 
         public void BackPropagate()
         {
-            // update weights to forward node
+            // update weights to forward nodes
             foreach (Node node in Nodes)
             {
-                node.Error = 0;
-                foreach (var valuePair in node.ForwardNodes)
-                {
-                    var forwardNode = valuePair.Key;
-                    var weight = valuePair.Value;
-
-                    // update this nodes error
-                    node.Error += node.Result * (1.0 - node.Result) * (weight * forwardNode.Error);
-
-                    // update this weight
-                    weight += forwardNode.Error * node.Result;
-                    node.ForwardNodes[valuePair.Key] = weight;
-                }
-                node.Error = node.Error / node.ForwardNodes.Count;
+                node.BackPropagate();
             }
             foreach (Node node in BiasInputs)
             {
-                foreach (var valuePair in node.ForwardNodes)
-                {
-                    var forwardNode = valuePair.Key;
-                    var weight = valuePair.Value;
-
-                    // update this weight
-                    weight += forwardNode.Error * node.Result;
-                    node.ForwardNodes[valuePair.Key] = weight;
-                }
+                node.BackPropagate();
             }
         }
 

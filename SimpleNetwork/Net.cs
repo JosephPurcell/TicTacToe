@@ -1,24 +1,51 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace TicTacToe
 {
+
+    // this is the top level class of the neural network
+
     public class Net
     {
-        public Net(int inputSize, int outputSize, int depth)
+        const int BiasNodeCount = 2;
+
+        public Net(List<LayerDescription> topology)
+        {
+            // add input layer
+            var layer1 = new Layer(topology[0].Size, topology[0].BiasCount, true);
+            Layers.Add(layer1);
+            
+            // add hidden layers and output layer
+            for (int i = 1; i < topology.Count; i++)
+            {
+                var layer = new Layer(topology[i].Size, topology[i].BiasCount);
+                Layers.Add(layer);
+            }
+
+            // Link layers...
+            for (int i = 0; i < Layers.Count - 1; i++)
+            {
+                var thisLayer = Layers[i];
+                var nextLayer = Layers[i + 1];
+                thisLayer.LinkLayer(nextLayer);
+            }
+        }
+        public Net(int inputSize, int hiddenLayerNeurons, int hiddenLayerDepth, int outputSize)
         {
             // Input layer
-            var layer1 = new Layer(inputSize,0);
+            var layer1 = new Layer(inputSize, BiasNodeCount, true);
             Layers.Add(layer1);
 
             // Middle layers
-            for(int i = 0; i < depth; i++) 
+            for(int i = 0; i < hiddenLayerDepth; i++) 
             {
-                var middleLayer = new Layer(inputSize,0);
+                var middleLayer = new Layer(hiddenLayerNeurons, BiasNodeCount);
                 Layers.Add(middleLayer);
             }
 
@@ -46,11 +73,12 @@ namespace TicTacToe
             {
                 firstLayer.Nodes[i].Result = localInputs[i];
             }
+            firstLayer.CalcLayer(1);
 
-            for(int i = 0; i < Layers.Count; i++)
+            for (int i = 1; i < Layers.Count; i++)
             {
                 var layer = Layers[i];
-                layer.CalcLayer();
+                layer.CalcLayer(Layers[i - 1].Nodes.Count + Layers[i - 1].BiasInputs.Count);
             }
 
             var lastLayer = Layers.Last();
@@ -60,49 +88,7 @@ namespace TicTacToe
             return results;
         }
 
-        //public void Train(List<Trainer> trainingData, double acceptableScore)
-        //{
-        //    Random r = new Random(17);
-        //    while (true)
-        //    {
-        //        var layers = Layers[0..];
-        //        foreach (var layer in layers)
-        //        {
-        //            foreach (var node in layer.Nodes)
-        //            {
-        //                foreach (var key in node.InputNodes.Keys)
-        //                {
-        //                    var originalScore = GetScore(trainingData);
-        //                    var originalValue = node.InputNodes[key];
-        //                    node.InputNodes[key] += r.NextDouble() < 0.5 ? -1* r.NextDouble() * 10 : r.NextDouble()* 10;
-        //                    var newScore = GetScore(trainingData);
-
-        //                    // Less is a better score!
-        //                    if(newScore < originalScore)
-        //                    {
-        //                        Console.WriteLine("Improved node!");
-        //                    }
-        //                    else
-        //                    {
-        //                        // Set value back to original value
-        //                        node.InputNodes[key] = originalValue;
-        //                    }
-        //                }
-        //            }
-        //        }
-
-        //        var score = GetScore(trainingData);
-        //        Console.WriteLine($"Scored: {score}");
-
-        //        if(score < acceptableScore)
-        //        {
-        //            Console.WriteLine("Training passed!");
-        //            return;
-        //        }
-        //    }
-        //}
-
-        public double Play(List<int> board)
+        public List<Double> Play(List<int> board)
         {
             // clear last results
             foreach (var layer in Layers)
@@ -116,7 +102,7 @@ namespace TicTacToe
                 inputs.Add(board[i]);
             }
             var results = this.GetResults(inputs);
-            return results[0];
+            return results;
         }
 
         public void BackPropagate(List<double> errors)
@@ -126,7 +112,7 @@ namespace TicTacToe
             {
                 lastLayer.Nodes[i].Error = errors[i];
             }
-            for (int i = Layers.Count - 2; i >0; i--)
+            for (int i = Layers.Count - 2; i >=0; i--)
             {
                 Layers[i].BackPropagate();
             }
@@ -146,14 +132,15 @@ namespace TicTacToe
             for(int i=0; i<9; i++)
             {
                 Layers[0].Nodes[i].Result = inputData[i];
+                Layers[0].Nodes[i].CalcNode(1);
             }
 
-            for(int i=0; i<Layers.Count-1; i++)
+            for (int i=1; i<Layers.Count-1; i++)
             {
                 var layer = Layers[i];
                 foreach(var node in layer.Nodes)
                 {
-                    node.CalcNode();
+                    node.CalcNode(Layers[i-1].Nodes.Count + Layers[i - 1].BiasInputs.Count);
                 }
             }
             return score;

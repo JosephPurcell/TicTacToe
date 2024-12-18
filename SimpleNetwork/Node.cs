@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace TicTacToe
 {
@@ -41,9 +42,10 @@ namespace TicTacToe
             ForwardNodes.Add(node, GetRandomNumber());
         }
 
-        public void CalcNode(int nodeCount = 9)
+        public virtual void CalcNode(int nodeCount = 1)
         {
-            Result = Sigmoid(Result/ nodeCount);
+            // hidden nodes will weighted inputs before applying sigmoid
+            Result = Sigmoid(Result / nodeCount);
             if (double.IsNaN(Result) || double.IsInfinity(Result) || double.IsNegativeInfinity(Result))
             {
                 throw new Exception("Bad result!");
@@ -54,6 +56,24 @@ namespace TicTacToe
                 var weight = valuePair.Value;
                 node.Result += weight * Result;
             }
+        }
+
+        public virtual void BackPropagate()
+        {
+            Error = 0;
+            foreach (var valuePair in ForwardNodes)
+            {
+                var forwardNode = valuePair.Key;
+                var weight = valuePair.Value;
+
+                // update this nodes error
+                Error += 2 * Result * (1.0 - Result) * (weight * forwardNode.Error);
+
+                // update this weight
+                weight += forwardNode.Error * Result;
+                ForwardNodes[valuePair.Key] = weight;
+            }
+            Error = Error / ForwardNodes.Count;
         }
     }
 }
