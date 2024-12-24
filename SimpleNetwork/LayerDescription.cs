@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace TicTacToe
 {
+
+    // this class is used to define the layers in a topology
+    // It is used to create the Layer objects in the network
     public class LayerDescription
     {
         public int Size { get; set; }

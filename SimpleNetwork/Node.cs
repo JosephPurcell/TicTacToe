@@ -2,18 +2,37 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
 namespace TicTacToe
 {
+    public class ForwardNode
+    {
+        [JsonIgnore]
+        public Node Node { get; set; }
+        public double Weight { get; set; }
+
+        public ForwardNode(Node node, double weight) 
+        { 
+            Node = node;
+            Weight = weight;
+        }
+    }
     public class Node
     {
+        // required for Json deserialization
+        public Node()
+        { }
+
         //Function to get random number
         private static readonly Random getrandom = new Random();
 
         public static double GetRandomNumber(double min = 0)
         {
+            // purpose of min was allow negative out[ut from
+            // the sigmoids. Didn't use it but left it in.
             lock (getrandom) // synchronize
             {
                 double random = getrandom.NextDouble();
@@ -26,20 +45,24 @@ namespace TicTacToe
         {
             Sigmoid = sigmoid;
             Result = result;
+            ForwardNodes = new List<ForwardNode>();
         }
 
-        public Dictionary<Node, double> ForwardNodes = new Dictionary<Node, double>();
+        public List<ForwardNode> ForwardNodes { get; set; }
 
         public double Result { get; set; }
 
         public double Bias { get; set; }
 
         public double Error { get; set;  }
+
+        [JsonIgnore]
         public Func<double, double> Sigmoid { get; set; }
 
         public void AddForwardNode(Node node)
         {
-            ForwardNodes.Add(node, GetRandomNumber());
+            ForwardNode forwardNode = new ForwardNode(node, GetRandomNumber());
+            ForwardNodes.Add(forwardNode);
         }
 
         public virtual void CalcNode(int nodeCount = 1)
@@ -50,28 +73,22 @@ namespace TicTacToe
             {
                 throw new Exception("Bad result!");
             }
-            foreach (var valuePair in ForwardNodes)
+            foreach (var forwardNode in ForwardNodes)
             {
-                var node = valuePair.Key;
-                var weight = valuePair.Value;
-                node.Result += weight * Result;
+                forwardNode.Node.Result += forwardNode.Weight * Result;
             }
         }
 
         public virtual void BackPropagate()
         {
             Error = 0;
-            foreach (var valuePair in ForwardNodes)
+            foreach (var forwardNode in ForwardNodes)
             {
-                var forwardNode = valuePair.Key;
-                var weight = valuePair.Value;
-
                 // update this nodes error
-                Error += 2 * Result * (1.0 - Result) * (weight * forwardNode.Error);
+                Error += Result * (1.0 - Result) * (forwardNode.Weight * forwardNode.Node.Error);
 
                 // update this weight
-                weight += forwardNode.Error * Result;
-                ForwardNodes[valuePair.Key] = weight;
+                forwardNode.Weight += 1.5 * forwardNode.Node.Error * Result;
             }
             Error = Error / ForwardNodes.Count;
         }

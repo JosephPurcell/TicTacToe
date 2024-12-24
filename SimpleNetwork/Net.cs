@@ -5,22 +5,26 @@ using System.Reflection.Emit;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Text.Json;
 
 namespace TicTacToe
 {
 
     // this is the top level class of the neural network
-
     public class Net
     {
         const int BiasNodeCount = 2;
+
+        // required for Json deserialization
+        public Net()
+        { }
 
         public Net(List<LayerDescription> topology)
         {
             // add input layer
             var layer1 = new Layer(topology[0].Size, topology[0].BiasCount, true);
             Layers.Add(layer1);
-            
+
             // add hidden layers and output layer
             for (int i = 1; i < topology.Count; i++)
             {
@@ -33,9 +37,10 @@ namespace TicTacToe
             {
                 var thisLayer = Layers[i];
                 var nextLayer = Layers[i + 1];
-                thisLayer.LinkLayer(nextLayer);
+                thisLayer.CreateLinks(nextLayer);
             }
         }
+
         public Net(int inputSize, int hiddenLayerNeurons, int hiddenLayerDepth, int outputSize)
         {
             // Input layer
@@ -43,22 +48,58 @@ namespace TicTacToe
             Layers.Add(layer1);
 
             // Middle layers
-            for(int i = 0; i < hiddenLayerDepth; i++) 
+            for (int i = 0; i < hiddenLayerDepth; i++)
             {
                 var middleLayer = new Layer(hiddenLayerNeurons, BiasNodeCount);
                 Layers.Add(middleLayer);
             }
 
             // Output layer
-            var outputLayer = new Layer(outputSize,0);
+            var outputLayer = new Layer(outputSize, 0);
             Layers.Add(outputLayer);
 
             // Link layers...
             for (int i = 0; i < Layers.Count - 1; i++)
             {
                 var thisLayer = Layers[i];
-                var nextLayer = Layers[i+1];
-                thisLayer.LinkLayer(nextLayer);
+                var nextLayer = Layers[i + 1];
+                thisLayer.CreateLinks(nextLayer);
+            }
+        }
+
+        // Two configuration operations to complete the network
+        // 1. the ForwardNodes in the Net could not be serialized.
+        // 2. The Sigmoids can not be serialized.
+        // Populate both here to complete the Net configuration.
+        public void PopulateDeserializedNetwork()
+        {
+            // Add Sigmoids
+            foreach (var layer in Layers)
+            {
+                foreach (Node node in layer.Nodes)
+                {
+                    node.Sigmoid = (double input) =>
+                    {
+                        // Mathematical sigmoid function
+                        return (1 / (1 + Math.Pow(Math.E, -1 * input)));
+                    };
+                }
+                foreach (Node node in layer.BiasInputs)
+                {
+                    node.Sigmoid = (double input) =>
+                    {
+                        // Mathematical sigmoid function
+                        return (1 / (1 + Math.Pow(Math.E, -1 * input)));
+                    };
+                }
+            }
+
+            // link forward nodes
+            for (int i = 0; i < Layers.Count - 1; i++)
+            {
+                var thisLayer = Layers[i];
+                var nextLayer = Layers[i + 1];
+                thisLayer.PopulateLinks(nextLayer);
             }
         }
 
@@ -116,34 +157,6 @@ namespace TicTacToe
             {
                 Layers[i].BackPropagate();
             }
-        }
-
-
-        public double GetScore(List<double> inputData)
-        {
-            // clear last results
-            foreach (var layer in Layers)
-            {
-                layer.ClearResults();
-            }
-
-            // apply inputs and process
-            var score = 0.0;
-            for(int i=0; i<9; i++)
-            {
-                Layers[0].Nodes[i].Result = inputData[i];
-                Layers[0].Nodes[i].CalcNode(1);
-            }
-
-            for (int i=1; i<Layers.Count-1; i++)
-            {
-                var layer = Layers[i];
-                foreach(var node in layer.Nodes)
-                {
-                    node.CalcNode(Layers[i-1].Nodes.Count + Layers[i - 1].BiasInputs.Count);
-                }
-            }
-            return score;
         }
     }
 }

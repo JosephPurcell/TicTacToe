@@ -1,7 +1,10 @@
 ﻿
+using Microsoft.ML.OnnxRuntime;
 using System;
 using System.ComponentModel.Design;
 using System.Numerics;
+using System.Text.Json;
+using System.Text;
 using TicTacToe;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -33,326 +36,448 @@ namespace TicTacToeUnitTests
 
         private Status evaluateMove(List<int> board, int myMove, out int bestMove)
         {
-
-            // giant switch with all possible moves
-            // row 1  *****************************************************/
-            if (((board[0] == -1 && board[1] == -1)
-                || (board[0] == 1 && board[1] == 1))
-                && myMove != 2)
-            {
-                bestMove = 2;
-                return Status.Lost;
-            }
-            if (board[0] == 1 && board[1] == 1 && myMove == 2)
+            // prioritize winning moves over preventing losses
+            // big switch with all possible winning moves
+            // rows *****************************************************/
+            if (board[0] == 1 && board[1] == 1 && board[2] == 0 && myMove == 2)
             {
                 bestMove = 2;
                 return Status.Won;
             }
 
-            if (((board[0] == -1 && board[2] == -1)
-                || (board[0] == 1 && board[2] == 1))
-                && myMove != 1)
-            {
-                bestMove = 1;
-                return Status.Lost;
-            }
-            if (board[0] == 1 && board[2] == 1 && myMove == 1)
+            if (board[0] == 1 && board[1] == 0 && board[2] == 1 && myMove == 1)
             {
                 bestMove = 1;
                 return Status.Won;
             }
 
-            if (((board[1] == -1 && board[2] == -1)
-                || (board[1] == 1 && board[2] == 1))
-                && myMove != 0)
-            {
-                bestMove = 0;
-                return Status.Lost;
-            }
-            if (board[1] == 1 && board[2] == 1 && myMove == 0)
+            if (board[0] == 0 && board[1] == 1 && board[2] == 1  && myMove == 0)
             {
                 bestMove = 0;
                 return Status.Won;
             }
 
-            // row 2 *****************************************************/
-            if (((board[3] == -1 && board[4] == -1)
-                || (board[3] == 1 && board[4] == 1))
-                && myMove != 5)
-            {
-                bestMove = 5;
-                return Status.Lost;
-            }
-            if (board[3] == 1 && board[4] == 1 && myMove == 5)
+            if (board[3] == 1 && board[4] == 1 && board[5] == 0 && myMove == 5)
             {
                 bestMove = 5;
                 return Status.Won;
             }
 
-            if (((board[3] == -1 && board[5] == -1)
-                || (board[3] == 1 && board[5] == 1))
-                && myMove != 4)
-            {
-                bestMove = 4;
-                return Status.Lost;
-            }
-            if (board[3] == 1 && board[5] == 1 && myMove == 4)
+            if (board[3] == 1 && board[4] == 0 && board[5] == 1 && myMove == 4)
             {
                 bestMove = 4;
                 return Status.Won;
             }
 
-            if (((board[4] == -1 && board[5] == -1)
-                || (board[4] == 1 && board[5] == 1))
-                && myMove != 3)
-            {
-                bestMove = 3;
-                return Status.Lost;
-            }
-            if (board[4] == 1 && board[5] == 1 && myMove == 3)
+            if (board[3] == 0 && board[4] == 1 && board[5] == 1 && myMove == 3)
             {
                 bestMove = 3;
                 return Status.Won;
             }
 
-            // row 3 *****************************************************/
-            if (((board[6] == -1 && board[7] == -1)
-                || (board[6] == 1 && board[7] == 1))
-                && myMove != 8)
-            {
-                bestMove = 8;
-                return Status.Lost;
-            }
-            if (board[6] == 1 && board[7] == 1 && myMove == 8)
+            if (board[6] == 1 && board[7] == 1 && board[8] == 0 && myMove == 8)
             {
                 bestMove = 8;
                 return Status.Won;
             }
 
-            if (((board[6] == -1 && board[8] == -1)
-                || (board[6] == 1 && board[8] == 1))
-                && myMove != 7)
-            {
-                bestMove = 7;
-                return Status.Lost;
-            }
-            if (board[6] == 1 && board[8] == 1 && myMove == 7)
+            if (board[6] == 1 && board[7] == 0 && board[8] == 1 && myMove == 7)
             {
                 bestMove = 7;
                 return Status.Won;
             }
 
-            if (((board[7] == -1 && board[8] == -1)
-                || (board[7] == 1 && board[8] == 1))
-                && myMove != 6)
-            {
-                bestMove = 6;
-                return Status.Lost;
-            }
-            if (board[7] == 1 && board[8] == 1 && myMove == 6)
+            if (board[6] == 0 && board[7] == 1 && board[8] == 1 && myMove == 6)
             {
                 bestMove = 6;
                 return Status.Won;
             }
 
-            // col 1 *****************************************************/
-            if (((board[0] == -1 && board[3] == -1)
-                || (board[0] == 1 && board[3] == 1))
-                && myMove != 6)
-            {
-                bestMove = 6;
-                return Status.Lost;
-            }
-            if (board[0] == 1 && board[3] == 1 && myMove == 6)
+            // columns
+            if (board[0] == 1 && board[3] == 1 && board[6] == 0 && myMove == 6)
             {
                 bestMove = 6;
                 return Status.Won;
             }
 
-            if (((board[0] == -1 && board[6] == -1)
-                || (board[0] == 1 && board[6] == 1))
-                && myMove != 3)
-            {
-                bestMove = 3;
-                return Status.Lost;
-            }
-            if (board[0] == 1 && board[6] == 1 && myMove == 3)
+            if (board[0] == 1 && board[3] == 0 && board[6] == 1 && myMove == 3)
             {
                 bestMove = 3;
                 return Status.Won;
             }
 
-            if (((board[3] == -1 && board[6] == -1)
-                || (board[3] == 1 && board[6] == 1))
-                && myMove != 0)
-            {
-                bestMove = 0;
-                return Status.Lost;
-            }
-            if (board[3] == 1 && board[6] == 1 && myMove == 0)
+            if (board[0] == 0 && board[3] == 1 && board[6] == 1 && myMove == 0)
             {
                 bestMove = 0;
                 return Status.Won;
             }
 
-            // col 2 *****************************************************/
-            if (((board[1] == -1 && board[4] == -1)
-                || (board[1] == 1 && board[4] == 1))
-                && myMove != 7)
-            {
-                bestMove = 7;
-                return Status.Lost;
-            }
-            if (board[1] == 1 && board[4] == 1 && myMove == 7)
+            if (board[1] == 1 && board[4] == 1 && board[7] == 0 && myMove == 7)
             {
                 bestMove = 7;
                 return Status.Won;
             }
 
-            if (((board[1] == -1 && board[7] == -1)
-                || (board[1] == 1 && board[7] == 1))
-                && myMove != 4)
-            {
-                bestMove = 4;
-                return Status.Lost;
-            }
-            if (board[1] == 1 && board[7] == 1 && myMove == 4)
+            if (board[1] == 1 && board[4] == 0 && board[7] == 1 && myMove == 4)
             {
                 bestMove = 4;
                 return Status.Won;
             }
 
-            if (((board[4] == -1 && board[7] == -1)
-                || (board[4] == 1 && board[7] == 1))
-                && myMove != 1)
-            {
-                bestMove = 1;
-                return Status.Lost;
-            }
-            if (board[3] == 4 && board[7] == 1 && myMove == 1)
+            if (board[1] == 0 && board[4] == 1 && board[7] == 1 && myMove == 1)
             {
                 bestMove = 1;
                 return Status.Won;
             }
 
-            // col 3 *****************************************************/
-            if (((board[2] == -1 && board[5] == -1)
-                || (board[2] == 1 && board[5] == 1))
-                && myMove != 8)
-            {
-                bestMove = 8;
-                return Status.Lost;
-            }
-            if (board[2] == 1 && board[5] == 1 && myMove == 8)
+            if (board[2] == 1 && board[5] == 1 && board[8] == 0 && myMove == 8)
             {
                 bestMove = 8;
                 return Status.Won;
             }
 
-            if (((board[2] == -1 && board[8] == -1)
-                || (board[2] == 1 && board[8] == 1))
-                && myMove != 5)
-            {
-                bestMove = 5;
-                return Status.Lost;
-            }
-            if (board[1] == 2 && board[8] == 1 && myMove == 5)
+            if (board[2] == 1 && board[5] == 0 && board[8] == 1 && myMove == 5)
             {
                 bestMove = 5;
                 return Status.Won;
             }
 
-            if (((board[5] == -1 && board[8] == -1)
-                || (board[5] == 1 && board[8] == 1))
-                && myMove != 2)
-            {
-                bestMove = 2;
-                return Status.Lost;
-            }
-            if (board[3] == 5 && board[8] == 1 && myMove == 2)
+            if (board[2] == 0 && board[5] == 1 && board[8] == 1 && myMove == 2)
             {
                 bestMove = 2;
                 return Status.Won;
             }
 
-            // diag 1 *****************************************************/
-            if (((board[0] == -1 && board[4] == -1)
-                || (board[0] == 1 && board[4] == 1))
-                && myMove != 8)
-            {
-                bestMove = 8;
-                return Status.Lost;
-            }
-            if (board[1] == 0 && board[4] == 1 && myMove == 8)
+            // diagonals
+            if (board[0] == 1 && board[4] == 1 && board[8] == 0 && myMove == 8)
             {
                 bestMove = 8;
                 return Status.Won;
             }
 
-            if (((board[0] == -1 && board[8] == -1)
-                || (board[0] == 1 && board[8] == 1))
-                && myMove != 4)
-            {
-                bestMove = 4;
-                return Status.Lost;
-            }
-            if (board[0] == 1 && board[8] == 1 && myMove == 4)
+            if (board[0] == 1 && board[4] == 0 && board[8] == 1 && myMove == 4)
             {
                 bestMove = 4;
                 return Status.Won;
             }
 
-            if (((board[4] == -1 && board[8] == -1)
-                || (board[4] == 1 && board[8] == 1))
-                && myMove != 0)
-            {
-                bestMove = 0;
-                return Status.Lost;
-            }
-            if (board[3] == 4 && board[8] == 1 && myMove == 0)
+            if (board[0] == 0 && board[4] == 1 && board[8] == 1 && myMove == 0)
             {
                 bestMove = 0;
                 return Status.Won;
             }
 
-            // diag 2 *****************************************************/
-            if (((board[2] == -1 && board[4] == -1)
-                || (board[2] == 1 && board[4] == 1))
-                && myMove != 6)
-            {
-                bestMove = 6;
-                return Status.Lost;
-            }
-            if (board[1] == 2 && board[4] == 1 && myMove == 6)
+            if (board[2] == 1 && board[4] == 1 && board[6] == 0 && myMove == 6)
             {
                 bestMove = 6;
                 return Status.Won;
             }
 
-            if (((board[2] == -1 && board[6] == -1)
-                || (board[2] == 1 && board[6] == 1))
-                && myMove != 4)
-            {
-                bestMove = 4;
-                return Status.Lost;
-            }
-            if (board[2] == 1 && board[6] == 1 && myMove == 4)
+            if (board[2] == 1 && board[4] == 0 && board[6] == 1 && myMove == 4)
             {
                 bestMove = 4;
                 return Status.Won;
             }
 
-            if (((board[4] == -1 && board[6] == -1)
-                || (board[4] == 1 && board[6] == 1))
-                && myMove != 2)
+            if (board[2] == 0 && board[4] == 1 && board[6] == 1 && myMove == 2)
+            {
+                bestMove = 2;
+                return Status.Won;
+            }
+
+            // successful blocks 
+            if (board[0] == -1 && board[1] == -1 && board[2] == 0 && myMove == 2)
+            {
+                bestMove = 2;
+                return Status.NeutralMove;
+            }
+
+            if (board[0] == -1 && board[1] == 0 && board[2] == -1 && myMove == 1)
+            {
+                bestMove = 1;
+                return Status.NeutralMove;
+            }
+
+            if (board[0] == 0 && board[1] == -1 && board[2] == -1 && myMove == 0)
+            {
+                bestMove = 0;
+                return Status.NeutralMove;
+            }
+
+            if (board[3] == -1 && board[4] == -1 && board[5] == 0 && myMove == 5)
+            {
+                bestMove = 5;
+                return Status.NeutralMove;
+            }
+
+            if (board[3] == -1 && board[4] == 0 && board[5] == -1 && myMove == 4)
+            {
+                bestMove = 4;
+                return Status.NeutralMove;
+            }
+
+            if (board[3] == 0 && board[4] == -1 && board[5] == -1 && myMove == 3)
+            {
+                bestMove = 3;
+                return Status.NeutralMove;
+            }
+
+            if (board[6] == -1 && board[7] == -1 && board[8] == 0 && myMove == 8)
+            {
+                bestMove = 8;
+                return Status.NeutralMove;
+            }
+
+            if (board[6] == -1 && board[7] == 0 && board[8] == -1 && myMove == 7)
+            {
+                bestMove = 7;
+                return Status.NeutralMove;
+            }
+
+            if (board[6] == 0 && board[7] == -1 && board[8] == -1 && myMove == 6)
+            {
+                bestMove = 6;
+                return Status.NeutralMove;
+            }
+
+            // columns
+            if (board[0] == -1 && board[3] == -1 && board[6] == 0 && myMove == 6)
+            {
+                bestMove = 6;
+                return Status.NeutralMove;
+            }
+
+            if (board[0] == -1 && board[3] == 0 && board[6] == -1 && myMove == 3)
+            {
+                bestMove = 3;
+                return Status.NeutralMove;
+            }
+
+            if (board[0] == 0 && board[3] == -1 && board[6] == -1 && myMove == 0)
+            {
+                bestMove = 0;
+                return Status.NeutralMove;
+            }
+
+            if (board[1] == -1 && board[4] == -1 && board[7] == 0 && myMove == 7)
+            {
+                bestMove = 7;
+                return Status.NeutralMove;
+            }
+
+            if (board[1] == -1 && board[4] == 0 && board[7] == -1 && myMove == 4)
+            {
+                bestMove = 4;
+                return Status.NeutralMove;
+            }
+
+            if (board[1] == 0 && board[4] == -1 && board[7] == -1 && myMove == -1)
+            {
+                bestMove = 1;
+                return Status.NeutralMove;
+            }
+
+            if (board[2] == -1 && board[5] == -1 && board[8] == 0 && myMove == 8)
+            {
+                bestMove = 8;
+                return Status.NeutralMove;
+            }
+
+            if (board[2] == -1 && board[5] == 0 && board[8] == -1 && myMove == 5)
+            {
+                bestMove = 5;
+                return Status.NeutralMove;
+            }
+
+            if (board[2] == 0 && board[5] == -1 && board[8] == -1 && myMove == 2)
+            {
+                bestMove = 2;
+                return Status.NeutralMove;
+            }
+
+            // diagonals
+            if (board[0] == -1 && board[4] == -1 && board[8] == 0 && myMove == 8)
+            {
+                bestMove = 8;
+                return Status.NeutralMove;
+            }
+
+            if (board[0] == -1 && board[4] == 0 && board[8] == -1 && myMove == 4)
+            {
+                bestMove = 4;
+                return Status.NeutralMove;
+            }
+
+            if (board[0] == 0 && board[4] == -1 && board[8] == -1 && myMove == 0)
+            {
+                bestMove = 0;
+                return Status.NeutralMove;
+            }
+
+            if (board[2] == -1 && board[4] == -1 && board[6] == 0 && myMove == 6)
+            {
+                bestMove = 6;
+                return Status.NeutralMove;
+            }
+
+            if (board[2] == -1 && board[4] == 0 && board[6] == -1 && myMove == 4)
+            {
+                bestMove = 4;
+                return Status.NeutralMove;
+            }
+
+            if (board[2] == 0 && board[4] == -1 && board[6] == -1 && myMove == 2)
+            {
+                bestMove = 2;
+                return Status.NeutralMove;
+            }
+
+            // unsuccessful blocks - losses
+            // rows *****************************************************/
+            if (board[0] == -1 && board[1] == -1 && board[2] == 0 && myMove != 2)
             {
                 bestMove = 2;
                 return Status.Lost;
             }
-            if (board[3] == 4 && board[6] == 1 && myMove == 2)
+
+            if (board[0] == -1 && board[1] == 0 && board[2] == -1 && myMove != 1)
+            {
+                bestMove = 1;
+                return Status.Lost;
+            }
+
+            if (board[0] == 0 && board[1] == -1 && board[2] == -1 && myMove != 0)
+            {
+                bestMove = 0;
+                return Status.Lost;
+            }
+
+            if (board[3] == -1 && board[4] == -1 && board[5] == 0 && myMove != 5)
+            {
+                bestMove = 5;
+                return Status.Lost;
+            }
+
+            if (board[3] == -1 && board[4] == 0 && board[5] == -1 && myMove != 4)
+            {
+                bestMove = 4;
+                return Status.Lost;
+            }
+
+            if (board[3] == 0 && board[4] == -1 && board[5] == -1 && myMove != 3)
+            {
+                bestMove = 3;
+                return Status.Lost;
+            }
+
+            if (board[6] == -1 && board[7] == -1 && board[8] == 0 && myMove != 8)
+            {
+                bestMove = 8;
+                return Status.Lost;
+            }
+
+            if (board[6] == -1 && board[7] == 0 && board[8] == -1 && myMove != 7)
+            {
+                bestMove = 7;
+                return Status.Lost;
+            }
+
+            if (board[6] == 0 && board[7] == -1 && board[8] == -1 && myMove != 6)
+            {
+                bestMove = 6;
+                return Status.Lost;
+            }
+
+            // columns
+            if (board[0] == -1 && board[3] == -1 && board[6] == 0 && myMove != 6)
+            {
+                bestMove = 6;
+                return Status.Lost;
+            }
+
+            if (board[0] == -1 && board[3] == 0 && board[6] == -1 && myMove != 3)
+            {
+                bestMove = 3;
+                return Status.Lost;
+            }
+
+            if (board[0] == 0 && board[3] == -1 && board[6] == -1 && myMove != 0)
+            {
+                bestMove = 0;
+                return Status.Lost;
+            }
+
+            if (board[1] == -1 && board[4] == -1 && board[7] == 0 && myMove != 7)
+            {
+                bestMove = 7;
+                return Status.Lost;
+            }
+
+            if (board[1] == -1 && board[4] == 0 && board[7] == -1 && myMove != 4)
+            {
+                bestMove = 4;
+                return Status.Lost;
+            }
+
+            if (board[1] == 0 && board[4] == -1 && board[7] == -1 && myMove != 1)
+            {
+                bestMove = 1;
+                return Status.Lost;
+            }
+
+            if (board[2] == -1 && board[5] == -1 && board[8] == 0 && myMove != 8)
+            {
+                bestMove = 8;
+                return Status.Lost;
+            }
+
+            if (board[2] == -1 && board[5] == 0 && board[8] == -1 && myMove != 5)
+            {
+                bestMove = 5;
+                return Status.Lost;
+            }
+
+            if (board[2] == 0 && board[5] == -1 && board[8] == -1 && myMove != 2)
             {
                 bestMove = 2;
-                return Status.Won;
+                return Status.Lost;
+            }
+
+            // diagonals
+            if (board[0] == -1 && board[4] == -1 && board[8] == 0 && myMove != 8)
+            {
+                bestMove = 8;
+                return Status.Lost;
+            }
+
+            if (board[0] == -1 && board[4] == 0 && board[8] == -1 && myMove != 4)
+            {
+                bestMove = 4;
+                return Status.Lost;
+            }
+
+            if (board[0] == 0 && board[4] == -1 && board[8] == -1 && myMove != 0)
+            {
+                bestMove = 0;
+                return Status.Lost;
+            }
+
+            if (board[2] == -1 && board[4] == -1 && board[6] == 0 && myMove != 6)
+            {
+                bestMove = 6;
+                return Status.Lost;
+            }
+
+            if (board[2] == -1 && board[4] == 0 && board[6] == -1 && myMove != 4)
+            {
+                bestMove = 4;
+                return Status.Lost;
+            }
+
+            if (board[2] == 0 && board[4] == -1 && board[6] == -1 && myMove != 2)
+            {
+                bestMove = 2;
+                return Status.Lost;
             }
 
             bestMove = myMove;
@@ -367,12 +492,12 @@ namespace TicTacToeUnitTests
                 if (board[i] == 0)
                 { // legal moves if missed this error is higher, if made this error is lower
                   // broken out for debugging. compiler will optimize in Release builds
-                    double error = orig[i] * (1 - orig[i]) * (1.0 - orig[i]);
+                    double error = orig[i] * (1 - orig[i]) * (.75 - orig[i]);
                     errors.Add(error); // just flag the bad move
                 }
                 else
                 { // illegal moves
-                    double error = orig[i] * (1 - orig[i]) * (0 - orig[i]);
+                    double error = orig[i] * (1 - orig[i]) * (.25 - orig[i]);
                     errors.Add(error); // just flag the bad move
                 }
             }
@@ -386,12 +511,12 @@ namespace TicTacToeUnitTests
             {
                 if (i == bestMove)
                 { 
-                    double error = orig[i] * (1 - orig[i]) * (1.0 - orig[i]);
+                    double error = orig[i] * (1 - orig[i]) * (.75 - orig[i]);
                     errors.Add(error); // just flag the bad move
                 }
                 else
                 { 
-                    double error = orig[i] * (1 - orig[i]) * (0 - orig[i]);
+                    double error = orig[i] * (1 - orig[i]) * (.25 - orig[i]);
                     errors.Add(error); // just flag the bad move
                 }
             }
@@ -425,7 +550,8 @@ namespace TicTacToeUnitTests
                                             0,0,0,
                                             0,0,0 };
 
-                for(int i=0;  i<board.Count-1; i++)
+                int count = rng.Next(8) + 1;
+                for (int i=0;  i < count; i++)
                 {
                     while(board[xMove] != 0)
                     {
@@ -484,7 +610,7 @@ namespace TicTacToeUnitTests
                     Status status = evaluateMove(board, oMove, out int bestMove);
                     board[oMove] = o;
                     errors = FindGameError(board, orig, bestMove);
-                    //network.BackPropagate(errors);
+                    network.BackPropagate(errors);
 
                     if (status == Status.Lost)
                     {
@@ -511,11 +637,10 @@ namespace TicTacToeUnitTests
         }
 
         [TestMethod]
-        public void TTTTestMethod()
+        public void AllTrainingTest()
         {
             int loopMax = 10000;
             int stability = 0;
-            //var network2 = new Net(9, 36, 1, 9);
             List<LayerDescription> topology = new List<LayerDescription>();
             LayerDescription layer = new LayerDescription(9, 2);
             topology.Add(layer);
@@ -528,16 +653,16 @@ namespace TicTacToeUnitTests
 
             layer = new LayerDescription(9, 0);
             topology.Add(layer);
-            var network2 = new Net(topology);
+            var network = new Net(topology);
 
-            int[] results2 = new int[loopMax];
-            ulong[] invalidMoves2 = new ulong[loopMax];
+            int[] results = new int[loopMax];
+            ulong[] invalidMoves = new ulong[loopMax];
             for (int i = 0; i < loopMax; i++)
             {
-                invalidMoves2[i] = LearnLegalMoves(network2);
-                if(invalidMoves2[i] == 0)
+                invalidMoves[i] = LearnLegalMoves(network);
+                if (invalidMoves[i] == 0)
                 {
-                    if(stability++ > 10)
+                    if (stability++ > 20)
                     {
                         break;
                     }
@@ -548,11 +673,17 @@ namespace TicTacToeUnitTests
                 }
             }
 
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            jsonOptions.WriteIndented = true;
+            StringBuilder savedLayerWeights = new StringBuilder();
+            savedLayerWeights.Append(JsonSerializer.Serialize<Net>(network, jsonOptions));
+            File.WriteAllText("weights.json", savedLayerWeights.ToString());
+
             stability = 0;
             for (int i = 0; i < loopMax; i++)
             {
-                results2[i] = Play(network2);
-                if (results2[i] == 0)
+                results[i] = Play(network);
+                if (results[i] == 0)
                 {
                     if (stability++ > 10)
                     {
@@ -565,7 +696,86 @@ namespace TicTacToeUnitTests
                 }
             }
 
-            Assert.IsTrue(results2[0] > results2[999]);
+            savedLayerWeights = new StringBuilder();
+            savedLayerWeights.Append(JsonSerializer.Serialize<Net>(network, jsonOptions));
+            File.WriteAllText("FinalWeights.json", savedLayerWeights.ToString());
+
+            Assert.IsTrue(results[loopMax - 1] == 0);
+        }
+
+        [TestMethod]
+        public void LearningMovesTest()
+        {
+            var weightsJson = File.ReadAllText("FinalWeights.json");
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            jsonOptions.WriteIndented = true;
+            Net network = JsonSerializer.Deserialize<Net>(weightsJson, jsonOptions);
+            network.PopulateDeserializedNetwork();
+
+            int loopMax = 10000;
+            int stability = 0;
+            ulong[] invalidMoves = new ulong[loopMax];
+
+            for (int i = 0; i < loopMax; i++)
+            {
+                invalidMoves[i] = LearnLegalMoves(network);
+                if (invalidMoves[i] == 0)
+                {
+                    if (stability++ > 20)
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    stability = 0;
+                }
+            }
+
+            jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            jsonOptions.WriteIndented = true;
+            StringBuilder savedLayerWeights = new StringBuilder();
+            savedLayerWeights.Append(JsonSerializer.Serialize<Net>(network, jsonOptions));
+            File.WriteAllText("FinalWeights.json", savedLayerWeights.ToString());
+
+            Assert.IsTrue(invalidMoves[loopMax - 1] == 0);
+        }
+
+
+        [TestMethod]
+        public void PlayingTest()
+        {
+            var weightsJson = File.ReadAllText("FinalWeights.json");
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            jsonOptions.WriteIndented = true;
+            Net network = JsonSerializer.Deserialize<Net>(weightsJson, jsonOptions);
+            network.PopulateDeserializedNetwork();
+
+            int loopMax = 10000;
+            int stability = 0;
+
+            int[] results = new int[loopMax];
+            for (int i = 0; i < loopMax; i++)
+            {
+                results[i] = Play(network);
+                if (results[i] == 0)
+                {
+                    if (stability++ > 10)
+                    {
+                        break;
+                    }
+                }
+                else
+                {
+                    stability = 0;
+                }
+            }
+
+            StringBuilder savedLayerWeights = new StringBuilder();
+            savedLayerWeights.Append(JsonSerializer.Serialize<Net>(network, jsonOptions));
+            File.WriteAllText("FinalWeights.json", savedLayerWeights.ToString());
+
+            Assert.IsTrue(results[loopMax-1] == 0);
         }
     }
 }

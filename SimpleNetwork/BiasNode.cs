@@ -9,6 +9,10 @@ namespace TicTacToe
 {
     public class BiasNode : Node
     {
+        // required for Json deserialization
+        public BiasNode()
+        { }
+
         public BiasNode(Func<double, double> sigmoid, double result = 0) : base(sigmoid, result)
         {
             Sigmoid = sigmoid;
@@ -22,24 +26,20 @@ namespace TicTacToe
             {
                 throw new Exception("Bad result!");
             }
-            foreach (var valuePair in ForwardNodes)
+            foreach (var forwardNode in ForwardNodes)
             {
-                var node = valuePair.Key;
-                var weight = valuePair.Value;
-                node.Result += weight * Sigmoid(Bias);
+                forwardNode.Node.Result += forwardNode.Weight * Bias;// Sigmoid(Bias);
             }
         }
 
+        // the BiasNodes and InputNodes could share a back propagate
+        // but this makes it easier to set  a breakpoint just for this type
         public override void BackPropagate()
         {
-            foreach (var valuePair in ForwardNodes)
+            foreach (var forwardNode in ForwardNodes)
             {
-                var forwardNode = valuePair.Key;
-                var weight = valuePair.Value;
-
                 // update this weight
-                weight += forwardNode.Error * Result;
-                ForwardNodes[valuePair.Key] = weight;
+                forwardNode.Weight += 1.5 * forwardNode.Node.Error * Bias;// Sigmoid(Bias);
             }
         }
     }

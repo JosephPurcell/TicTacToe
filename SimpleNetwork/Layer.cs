@@ -8,6 +8,10 @@ namespace TicTacToe
 {
     public class Layer
     {
+        // required for Json deserialization
+        public Layer()
+        { }
+
         int Width { get; set; } = 0;
         public Layer(int width, int Bias, bool inputLayer = false)
         {
@@ -78,6 +82,7 @@ namespace TicTacToe
             }
         }
 
+        // used in backpropagation
         public void ClearResults()
         {
             for(int i=0; i<Width; i++)
@@ -86,7 +91,28 @@ namespace TicTacToe
             }
         }
 
-        public void LinkLayer(Layer nextLayer)
+        // used to instantiate a serialized network
+        public void PopulateLinks(Layer nextLayer)
+        {
+            foreach (var node in Nodes)
+            {
+                for (int i = 0; i < node.ForwardNodes.Count; i++)
+                {
+                    node.ForwardNodes[i].Node = nextLayer.Nodes[i];
+                }
+            }
+
+            foreach (var node in BiasInputs)
+            {
+                for (int i = 0; i < node.ForwardNodes.Count; i++)
+                {
+                    node.ForwardNodes[i].Node = nextLayer.Nodes[i];
+                }
+            }
+        }
+
+        // used to build a network from scratch
+        public void CreateLinks(Layer nextLayer)
         {
             foreach (var node in Nodes)
             {
