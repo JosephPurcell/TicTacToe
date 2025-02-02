@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Text;
 using TicTacToe;
 using static System.Runtime.InteropServices.JavaScript.JSType;
+using System.Net;
 
 namespace TicTacToeUnitTests
 {
@@ -34,299 +35,299 @@ namespace TicTacToeUnitTests
             NeutralMove
         }
 
-        private Status evaluateMove(List<int> board, int myMove, out int bestMove)
+        private Status evaluateMove(List<int> board, int myMove, int player, out int bestMove)
         {
             // prioritize winning moves over preventing losses
             // big switch with all possible winning moves
             // rows *****************************************************/
-            if (board[0] == 1 && board[1] == 1 && board[2] == 0 && myMove == 2)
+            if (board[0] == player && board[1] == player && board[2] == 0 && myMove == 2)
             {
                 bestMove = 2;
                 return Status.Won;
             }
 
-            if (board[0] == 1 && board[1] == 0 && board[2] == 1 && myMove == 1)
+            if (board[0] == player && board[1] == 0 && board[2] == player && myMove == 1)
             {
                 bestMove = 1;
                 return Status.Won;
             }
 
-            if (board[0] == 0 && board[1] == 1 && board[2] == 1  && myMove == 0)
+            if (board[0] == 0 && board[1] == player && board[2] == player  && myMove == 0)
             {
                 bestMove = 0;
                 return Status.Won;
             }
 
-            if (board[3] == 1 && board[4] == 1 && board[5] == 0 && myMove == 5)
+            if (board[3] == player && board[4] == player && board[5] == 0 && myMove == 5)
             {
                 bestMove = 5;
                 return Status.Won;
             }
 
-            if (board[3] == 1 && board[4] == 0 && board[5] == 1 && myMove == 4)
+            if (board[3] == player && board[4] == 0 && board[5] == player && myMove == 4)
             {
                 bestMove = 4;
                 return Status.Won;
             }
 
-            if (board[3] == 0 && board[4] == 1 && board[5] == 1 && myMove == 3)
+            if (board[3] == 0 && board[4] == player && board[5] == player && myMove == 3)
             {
                 bestMove = 3;
                 return Status.Won;
             }
 
-            if (board[6] == 1 && board[7] == 1 && board[8] == 0 && myMove == 8)
+            if (board[6] == player && board[7] == player && board[8] == 0 && myMove == 8)
             {
                 bestMove = 8;
                 return Status.Won;
             }
 
-            if (board[6] == 1 && board[7] == 0 && board[8] == 1 && myMove == 7)
+            if (board[6] == player && board[7] == 0 && board[8] == player && myMove == 7)
             {
                 bestMove = 7;
                 return Status.Won;
             }
 
-            if (board[6] == 0 && board[7] == 1 && board[8] == 1 && myMove == 6)
+            if (board[6] == 0 && board[7] == player && board[8] == player && myMove == 6)
             {
                 bestMove = 6;
                 return Status.Won;
             }
 
             // columns
-            if (board[0] == 1 && board[3] == 1 && board[6] == 0 && myMove == 6)
+            if (board[0] == player && board[3] == player && board[6] == 0 && myMove == 6)
             {
                 bestMove = 6;
                 return Status.Won;
             }
 
-            if (board[0] == 1 && board[3] == 0 && board[6] == 1 && myMove == 3)
+            if (board[0] == player && board[3] == 0 && board[6] == player && myMove == 3)
             {
                 bestMove = 3;
                 return Status.Won;
             }
 
-            if (board[0] == 0 && board[3] == 1 && board[6] == 1 && myMove == 0)
+            if (board[0] == 0 && board[3] == player && board[6] == player && myMove == 0)
             {
                 bestMove = 0;
                 return Status.Won;
             }
 
-            if (board[1] == 1 && board[4] == 1 && board[7] == 0 && myMove == 7)
+            if (board[1] == player && board[4] == player && board[7] == 0 && myMove == 7)
             {
                 bestMove = 7;
                 return Status.Won;
             }
 
-            if (board[1] == 1 && board[4] == 0 && board[7] == 1 && myMove == 4)
+            if (board[1] == player && board[4] == 0 && board[7] == player && myMove == 4)
             {
                 bestMove = 4;
                 return Status.Won;
             }
 
-            if (board[1] == 0 && board[4] == 1 && board[7] == 1 && myMove == 1)
+            if (board[1] == 0 && board[4] == player && board[7] == player && myMove == 1)
             {
                 bestMove = 1;
                 return Status.Won;
             }
 
-            if (board[2] == 1 && board[5] == 1 && board[8] == 0 && myMove == 8)
+            if (board[2] == player && board[5] == player && board[8] == 0 && myMove == 8)
             {
                 bestMove = 8;
                 return Status.Won;
             }
 
-            if (board[2] == 1 && board[5] == 0 && board[8] == 1 && myMove == 5)
+            if (board[2] == player && board[5] == 0 && board[8] == player && myMove == 5)
             {
                 bestMove = 5;
                 return Status.Won;
             }
 
-            if (board[2] == 0 && board[5] == 1 && board[8] == 1 && myMove == 2)
+            if (board[2] == 0 && board[5] == player && board[8] == player && myMove == 2)
             {
                 bestMove = 2;
                 return Status.Won;
             }
 
             // diagonals
-            if (board[0] == 1 && board[4] == 1 && board[8] == 0 && myMove == 8)
+            if (board[0] == player && board[4] == player && board[8] == 0 && myMove == 8)
             {
                 bestMove = 8;
                 return Status.Won;
             }
 
-            if (board[0] == 1 && board[4] == 0 && board[8] == 1 && myMove == 4)
+            if (board[0] == player && board[4] == 0 && board[8] == player && myMove == 4)
             {
                 bestMove = 4;
                 return Status.Won;
             }
 
-            if (board[0] == 0 && board[4] == 1 && board[8] == 1 && myMove == 0)
+            if (board[0] == 0 && board[4] == player && board[8] == player && myMove == 0)
             {
                 bestMove = 0;
                 return Status.Won;
             }
 
-            if (board[2] == 1 && board[4] == 1 && board[6] == 0 && myMove == 6)
+            if (board[2] == player && board[4] == player && board[6] == 0 && myMove == 6)
             {
                 bestMove = 6;
                 return Status.Won;
             }
 
-            if (board[2] == 1 && board[4] == 0 && board[6] == 1 && myMove == 4)
+            if (board[2] == player && board[4] == 0 && board[6] == player && myMove == 4)
             {
                 bestMove = 4;
                 return Status.Won;
             }
 
-            if (board[2] == 0 && board[4] == 1 && board[6] == 1 && myMove == 2)
+            if (board[2] == 0 && board[4] == player && board[6] == player && myMove == 2)
             {
                 bestMove = 2;
                 return Status.Won;
             }
 
             // successful blocks 
-            if (board[0] == -1 && board[1] == -1 && board[2] == 0 && myMove == 2)
+            if (board[0] == -player && board[1] == -player && board[2] == 0 && myMove == 2)
             {
                 bestMove = 2;
                 return Status.NeutralMove;
             }
 
-            if (board[0] == -1 && board[1] == 0 && board[2] == -1 && myMove == 1)
+            if (board[0] == -player && board[1] == 0 && board[2] == -player && myMove == 1)
             {
                 bestMove = 1;
                 return Status.NeutralMove;
             }
 
-            if (board[0] == 0 && board[1] == -1 && board[2] == -1 && myMove == 0)
+            if (board[0] == 0 && board[1] == -player && board[2] == -player && myMove == 0)
             {
                 bestMove = 0;
                 return Status.NeutralMove;
             }
 
-            if (board[3] == -1 && board[4] == -1 && board[5] == 0 && myMove == 5)
+            if (board[3] == -player && board[4] == -player && board[5] == 0 && myMove == 5)
             {
                 bestMove = 5;
                 return Status.NeutralMove;
             }
 
-            if (board[3] == -1 && board[4] == 0 && board[5] == -1 && myMove == 4)
+            if (board[3] == -player && board[4] == 0 && board[5] == -player && myMove == 4)
             {
                 bestMove = 4;
                 return Status.NeutralMove;
             }
 
-            if (board[3] == 0 && board[4] == -1 && board[5] == -1 && myMove == 3)
+            if (board[3] == 0 && board[4] == -player && board[5] == -player && myMove == 3)
             {
                 bestMove = 3;
                 return Status.NeutralMove;
             }
 
-            if (board[6] == -1 && board[7] == -1 && board[8] == 0 && myMove == 8)
+            if (board[6] == -player && board[7] == -player && board[8] == 0 && myMove == 8)
             {
                 bestMove = 8;
                 return Status.NeutralMove;
             }
 
-            if (board[6] == -1 && board[7] == 0 && board[8] == -1 && myMove == 7)
+            if (board[6] == -player && board[7] == 0 && board[8] == -player && myMove == 7)
             {
                 bestMove = 7;
                 return Status.NeutralMove;
             }
 
-            if (board[6] == 0 && board[7] == -1 && board[8] == -1 && myMove == 6)
+            if (board[6] == 0 && board[7] == -player && board[8] == -player && myMove == 6)
             {
                 bestMove = 6;
                 return Status.NeutralMove;
             }
 
             // columns
-            if (board[0] == -1 && board[3] == -1 && board[6] == 0 && myMove == 6)
+            if (board[0] == -player && board[3] == -player && board[6] == 0 && myMove == 6)
             {
                 bestMove = 6;
                 return Status.NeutralMove;
             }
 
-            if (board[0] == -1 && board[3] == 0 && board[6] == -1 && myMove == 3)
+            if (board[0] == -player && board[3] == 0 && board[6] == -player && myMove == 3)
             {
                 bestMove = 3;
                 return Status.NeutralMove;
             }
 
-            if (board[0] == 0 && board[3] == -1 && board[6] == -1 && myMove == 0)
+            if (board[0] == 0 && board[3] == -player && board[6] == -player && myMove == 0)
             {
                 bestMove = 0;
                 return Status.NeutralMove;
             }
 
-            if (board[1] == -1 && board[4] == -1 && board[7] == 0 && myMove == 7)
+            if (board[1] == -player && board[4] == -player && board[7] == 0 && myMove == 7)
             {
                 bestMove = 7;
                 return Status.NeutralMove;
             }
 
-            if (board[1] == -1 && board[4] == 0 && board[7] == -1 && myMove == 4)
+            if (board[1] == -player && board[4] == 0 && board[7] == -player && myMove == 4)
             {
                 bestMove = 4;
                 return Status.NeutralMove;
             }
 
-            if (board[1] == 0 && board[4] == -1 && board[7] == -1 && myMove == -1)
+            if (board[1] == 0 && board[4] == -player && board[7] == -player && myMove == 1)
             {
                 bestMove = 1;
                 return Status.NeutralMove;
             }
 
-            if (board[2] == -1 && board[5] == -1 && board[8] == 0 && myMove == 8)
+            if (board[2] == -player && board[5] == -player && board[8] == 0 && myMove == 8)
             {
                 bestMove = 8;
                 return Status.NeutralMove;
             }
 
-            if (board[2] == -1 && board[5] == 0 && board[8] == -1 && myMove == 5)
+            if (board[2] == -player && board[5] == 0 && board[8] == -player && myMove == 5)
             {
                 bestMove = 5;
                 return Status.NeutralMove;
             }
 
-            if (board[2] == 0 && board[5] == -1 && board[8] == -1 && myMove == 2)
+            if (board[2] == 0 && board[5] == -player && board[8] == -player && myMove == 2)
             {
                 bestMove = 2;
                 return Status.NeutralMove;
             }
 
             // diagonals
-            if (board[0] == -1 && board[4] == -1 && board[8] == 0 && myMove == 8)
+            if (board[0] == -player && board[4] == -player && board[8] == 0 && myMove == 8)
             {
                 bestMove = 8;
                 return Status.NeutralMove;
             }
 
-            if (board[0] == -1 && board[4] == 0 && board[8] == -1 && myMove == 4)
+            if (board[0] == -player && board[4] == 0 && board[8] == -player && myMove == 4)
             {
                 bestMove = 4;
                 return Status.NeutralMove;
             }
 
-            if (board[0] == 0 && board[4] == -1 && board[8] == -1 && myMove == 0)
+            if (board[0] == 0 && board[4] == -player && board[8] == -player && myMove == 0)
             {
                 bestMove = 0;
                 return Status.NeutralMove;
             }
 
-            if (board[2] == -1 && board[4] == -1 && board[6] == 0 && myMove == 6)
+            if (board[2] == -player && board[4] == -player && board[6] == 0 && myMove == 6)
             {
                 bestMove = 6;
                 return Status.NeutralMove;
             }
 
-            if (board[2] == -1 && board[4] == 0 && board[6] == -1 && myMove == 4)
+            if (board[2] == -player && board[4] == 0 && board[6] == -player && myMove == 4)
             {
                 bestMove = 4;
                 return Status.NeutralMove;
             }
 
-            if (board[2] == 0 && board[4] == -1 && board[6] == -1 && myMove == 2)
+            if (board[2] == 0 && board[4] == -player && board[6] == -player && myMove == 2)
             {
                 bestMove = 2;
                 return Status.NeutralMove;
@@ -334,147 +335,147 @@ namespace TicTacToeUnitTests
 
             // unsuccessful blocks - losses
             // rows *****************************************************/
-            if (board[0] == -1 && board[1] == -1 && board[2] == 0 && myMove != 2)
+            if (board[0] == -player && board[1] == -player && board[2] == 0 && myMove != 2)
             {
                 bestMove = 2;
                 return Status.Lost;
             }
 
-            if (board[0] == -1 && board[1] == 0 && board[2] == -1 && myMove != 1)
+            if (board[0] == -player && board[1] == 0 && board[2] == -player && myMove != 1)
             {
                 bestMove = 1;
                 return Status.Lost;
             }
 
-            if (board[0] == 0 && board[1] == -1 && board[2] == -1 && myMove != 0)
+            if (board[0] == 0 && board[1] == -player && board[2] == -player && myMove != 0)
             {
                 bestMove = 0;
                 return Status.Lost;
             }
 
-            if (board[3] == -1 && board[4] == -1 && board[5] == 0 && myMove != 5)
+            if (board[3] == -player && board[4] == -player && board[5] == 0 && myMove != 5)
             {
                 bestMove = 5;
                 return Status.Lost;
             }
 
-            if (board[3] == -1 && board[4] == 0 && board[5] == -1 && myMove != 4)
+            if (board[3] == -player && board[4] == 0 && board[5] == -player && myMove != 4)
             {
                 bestMove = 4;
                 return Status.Lost;
             }
 
-            if (board[3] == 0 && board[4] == -1 && board[5] == -1 && myMove != 3)
+            if (board[3] == 0 && board[4] == -player && board[5] == -player && myMove != 3)
             {
                 bestMove = 3;
                 return Status.Lost;
             }
 
-            if (board[6] == -1 && board[7] == -1 && board[8] == 0 && myMove != 8)
+            if (board[6] == -player && board[7] == -player && board[8] == 0 && myMove != 8)
             {
                 bestMove = 8;
                 return Status.Lost;
             }
 
-            if (board[6] == -1 && board[7] == 0 && board[8] == -1 && myMove != 7)
+            if (board[6] == -player && board[7] == 0 && board[8] == -player && myMove != 7)
             {
                 bestMove = 7;
                 return Status.Lost;
             }
 
-            if (board[6] == 0 && board[7] == -1 && board[8] == -1 && myMove != 6)
+            if (board[6] == 0 && board[7] == -player && board[8] == -player && myMove != 6)
             {
                 bestMove = 6;
                 return Status.Lost;
             }
 
             // columns
-            if (board[0] == -1 && board[3] == -1 && board[6] == 0 && myMove != 6)
+            if (board[0] == -player && board[3] == -player && board[6] == 0 && myMove != 6)
             {
                 bestMove = 6;
                 return Status.Lost;
             }
 
-            if (board[0] == -1 && board[3] == 0 && board[6] == -1 && myMove != 3)
+            if (board[0] == -player && board[3] == 0 && board[6] == -player && myMove != 3)
             {
                 bestMove = 3;
                 return Status.Lost;
             }
 
-            if (board[0] == 0 && board[3] == -1 && board[6] == -1 && myMove != 0)
+            if (board[0] == 0 && board[3] == -player && board[6] == -player && myMove != 0)
             {
                 bestMove = 0;
                 return Status.Lost;
             }
 
-            if (board[1] == -1 && board[4] == -1 && board[7] == 0 && myMove != 7)
+            if (board[1] == -player && board[4] == -player && board[7] == 0 && myMove != 7)
             {
                 bestMove = 7;
                 return Status.Lost;
             }
 
-            if (board[1] == -1 && board[4] == 0 && board[7] == -1 && myMove != 4)
+            if (board[1] == -player && board[4] == 0 && board[7] == -player && myMove != 4)
             {
                 bestMove = 4;
                 return Status.Lost;
             }
 
-            if (board[1] == 0 && board[4] == -1 && board[7] == -1 && myMove != 1)
+            if (board[1] == 0 && board[4] == -player && board[7] == -player && myMove != 1)
             {
                 bestMove = 1;
                 return Status.Lost;
             }
 
-            if (board[2] == -1 && board[5] == -1 && board[8] == 0 && myMove != 8)
+            if (board[2] == -player && board[5] == -player && board[8] == 0 && myMove != 8)
             {
                 bestMove = 8;
                 return Status.Lost;
             }
 
-            if (board[2] == -1 && board[5] == 0 && board[8] == -1 && myMove != 5)
+            if (board[2] == -player && board[5] == 0 && board[8] == -player && myMove != 5)
             {
                 bestMove = 5;
                 return Status.Lost;
             }
 
-            if (board[2] == 0 && board[5] == -1 && board[8] == -1 && myMove != 2)
+            if (board[2] == 0 && board[5] == -player && board[8] == -player && myMove != 2)
             {
                 bestMove = 2;
                 return Status.Lost;
             }
 
             // diagonals
-            if (board[0] == -1 && board[4] == -1 && board[8] == 0 && myMove != 8)
+            if (board[0] == -player && board[4] == -player && board[8] == 0 && myMove != 8)
             {
                 bestMove = 8;
                 return Status.Lost;
             }
 
-            if (board[0] == -1 && board[4] == 0 && board[8] == -1 && myMove != 4)
+            if (board[0] == -player && board[4] == 0 && board[8] == -player && myMove != 4)
             {
                 bestMove = 4;
                 return Status.Lost;
             }
 
-            if (board[0] == 0 && board[4] == -1 && board[8] == -1 && myMove != 0)
+            if (board[0] == 0 && board[4] == -player && board[8] == -player && myMove != 0)
             {
                 bestMove = 0;
                 return Status.Lost;
             }
 
-            if (board[2] == -1 && board[4] == -1 && board[6] == 0 && myMove != 6)
+            if (board[2] == -player && board[4] == -player && board[6] == 0 && myMove != 6)
             {
                 bestMove = 6;
                 return Status.Lost;
             }
 
-            if (board[2] == -1 && board[4] == 0 && board[6] == -1 && myMove != 4)
+            if (board[2] == -player && board[4] == 0 && board[6] == -player && myMove != 4)
             {
                 bestMove = 4;
                 return Status.Lost;
             }
 
-            if (board[2] == 0 && board[4] == -1 && board[6] == -1 && myMove != 2)
+            if (board[2] == 0 && board[4] == -player && board[6] == -player && myMove != 2)
             {
                 bestMove = 2;
                 return Status.Lost;
@@ -536,13 +537,12 @@ namespace TicTacToeUnitTests
             return max;
         }
 
-        public ulong LearnLegalMoves(Net network)
+        public ulong LearnLegalMoves(Net network, int player)
         {
             Random rng = new Random();
             ulong invalidMoves = 0;
             List<double> errors = new List<double>();
-            int xMove = rng.Next(9);
-            int scale = 1;
+            int autoMove = rng.Next(9);
 
             for (int loop = 0; loop < 100000; loop++)
             {
@@ -550,65 +550,97 @@ namespace TicTacToeUnitTests
                                             0,0,0,
                                             0,0,0 };
 
-                int count = rng.Next(8) + 1;
+                int count = rng.Next(8) + 1; //rng() will return 0 -> 7, but I want at least 1 move
+                int scale = -1;
                 for (int i=0;  i < count; i++)
                 {
-                    while(board[xMove] != 0)
+                    while(board[autoMove] != 0)
                     {
-                        xMove = rng.Next(9);
+                        autoMove = rng.Next(9); // squares 0 -> 8
                     }
-                    board[xMove] = scale;
-                    scale = -scale;
+                    board[autoMove] = scale;
+                    scale = -scale; // x's and o's
                 }
+
                 List<double> orig = network.Play(board);
-                int oMove = FindMove(orig);
-                if (board[oMove] != 0)
+                int playerMove = FindMove(orig);
+                if (board[playerMove] != 0)
                 {
                     invalidMoves++;
                 }
-                errors = FindMoveError(board, orig, oMove);
+                errors = FindMoveError(board, orig, playerMove);
                 network.BackPropagate(errors);
-                board[oMove] = o;
+                board[playerMove] = player;
             }
             return invalidMoves;
         }
 
-        public int Play(Net network)
+        public int Play(Net network, int player)
         {
             int lostGames = 0;
             int wonGames = 0;
             int tieGames = 0;
+            int turns = 0;
+            int playerMove;
+            List<double> orig;
             List<double> errors = new List<double>();
 
             Random rng = new Random();
+
 
             for (int loop = 0; loop < 100000; loop++)
             {
                 List<int> board = new List<int>() { 0, 0, 0,
                                             0, 0, 0,
                                             0, 0, 0 };
-                for (int i = 0; i < 4; i++)
+                while(((turns < 9) && (player == x))
+                    || ((turns < 8) && (player == o)))
                 {
-                    int xMove = rng.Next(9);
-                    while (board[xMove] != 0)
+                    turns += 2; // each player moves once
+                    if (player == o)
                     {
-                        xMove = rng.Next(9);
-                    }
-                    board[xMove] = x;
+                        int xMove = rng.Next(9);
+                        while (board[xMove] != 0)
+                        {
+                            xMove = rng.Next(9);
+                        }
+                        board[xMove] = x;
 
-                    List<double> orig = network.Play(board);
-                    int oMove = FindMove(orig);
-                    if (board[oMove] != 0)
+                        orig = network.Play(board);
+                        playerMove = FindMove(orig);
+                        if (board[playerMove] != 0)
+                        {
+                            // should it be done learning legal moves
+                            errors = FindMoveError(board, orig, playerMove);
+                            network.BackPropagate(errors);
+                            lostGames++;
+                            break;
+                        }
+                    }
+                    else
                     {
-                        // should it be done learning legal moves
-                        errors = FindMoveError(board, orig, oMove);
-                        network.BackPropagate(errors);
-                        lostGames++;
-                        break;
+                        orig = network.Play(board);
+                        playerMove = FindMove(orig);
+                        if (board[playerMove] != 0)
+                        {
+                            // should it be done learning legal moves
+                            errors = FindMoveError(board, orig, playerMove);
+                            network.BackPropagate(errors);
+                            lostGames++;
+                            break;
+                        }
+
+                        int oMove = rng.Next(9);
+                        while (board[oMove] != 0)
+                        {
+                            oMove = rng.Next(9);
+                        }
+                        board[oMove] = x;
                     }
 
-                    Status status = evaluateMove(board, oMove, out int bestMove);
-                    board[oMove] = o;
+
+                    Status status = evaluateMove(board, playerMove, player, out int bestMove);
+                    board[playerMove] = player;
                     errors = FindGameError(board, orig, bestMove);
                     network.BackPropagate(errors);
 
@@ -627,7 +659,7 @@ namespace TicTacToeUnitTests
                         wonGames++;
                         break;
                     }
-                    if (i == 3)
+                    if (turns == 9)
                     {
                         tieGames++;
                     }
@@ -637,10 +669,12 @@ namespace TicTacToeUnitTests
         }
 
         [TestMethod]
-        public void AllTrainingTest()
+        public void AllTrainingTestPlayerO()
         {
             int loopMax = 10000;
             int stability = 0;
+            int player = o;
+
             List<LayerDescription> topology = new List<LayerDescription>();
             LayerDescription layer = new LayerDescription(9, 2);
             topology.Add(layer);
@@ -659,7 +693,7 @@ namespace TicTacToeUnitTests
             ulong[] invalidMoves = new ulong[loopMax];
             for (int i = 0; i < loopMax; i++)
             {
-                invalidMoves[i] = LearnLegalMoves(network);
+                invalidMoves[i] = LearnLegalMoves(network, player);
                 if (invalidMoves[i] == 0)
                 {
                     if (stability++ > 20)
@@ -682,7 +716,7 @@ namespace TicTacToeUnitTests
             stability = 0;
             for (int i = 0; i < loopMax; i++)
             {
-                results[i] = Play(network);
+                results[i] = Play(network, o);
                 if (results[i] == 0)
                 {
                     if (stability++ > 10)
@@ -711,6 +745,7 @@ namespace TicTacToeUnitTests
             jsonOptions.WriteIndented = true;
             Net network = JsonSerializer.Deserialize<Net>(weightsJson, jsonOptions);
             network.PopulateDeserializedNetwork();
+            int player = 1; //o
 
             int loopMax = 10000;
             int stability = 0;
@@ -718,7 +753,7 @@ namespace TicTacToeUnitTests
 
             for (int i = 0; i < loopMax; i++)
             {
-                invalidMoves[i] = LearnLegalMoves(network);
+                invalidMoves[i] = LearnLegalMoves(network, player);
                 if (invalidMoves[i] == 0)
                 {
                     if (stability++ > 20)
@@ -745,7 +780,13 @@ namespace TicTacToeUnitTests
         [TestMethod]
         public void PlayingTest()
         {
-            var weightsJson = File.ReadAllText("FinalWeights.json");
+            PlayingTest(o, "FinalWeightsO.json");
+            PlayingTest(x, "FinalWeightsX.json");
+        }
+
+        public void PlayingTest(int player, string finalweights)
+        { 
+            var weightsJson = File.ReadAllText("weights.json");
             JsonSerializerOptions jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
             jsonOptions.WriteIndented = true;
             Net network = JsonSerializer.Deserialize<Net>(weightsJson, jsonOptions);
@@ -757,7 +798,7 @@ namespace TicTacToeUnitTests
             int[] results = new int[loopMax];
             for (int i = 0; i < loopMax; i++)
             {
-                results[i] = Play(network);
+                results[i] = Play(network, player);
                 if (results[i] == 0)
                 {
                     if (stability++ > 10)
@@ -773,9 +814,107 @@ namespace TicTacToeUnitTests
 
             StringBuilder savedLayerWeights = new StringBuilder();
             savedLayerWeights.Append(JsonSerializer.Serialize<Net>(network, jsonOptions));
-            File.WriteAllText("FinalWeights.json", savedLayerWeights.ToString());
+            File.WriteAllText(finalweights, savedLayerWeights.ToString());
 
             Assert.IsTrue(results[loopMax-1] == 0);
+        }
+
+        [TestMethod]
+        public void PlayingAgainstItself()
+        {
+            int lostGames = 0;
+            int wonGames = 0;
+            int tieGames = 0;
+            int moveCount = 0;
+
+            var weightsJsonX = File.ReadAllText("FinalWeightsX.json");
+            var weightsJsonO = File.ReadAllText("FinalWeightsO.json");
+            JsonSerializerOptions jsonOptions = new JsonSerializerOptions(JsonSerializerDefaults.Web);
+            jsonOptions.WriteIndented = true;
+
+            // player #1
+            Net player1 = JsonSerializer.Deserialize<Net>(weightsJsonX, jsonOptions);
+            player1.PopulateDeserializedNetwork();
+
+            // player #2
+            Net player2 = JsonSerializer.Deserialize<Net>(weightsJsonO, jsonOptions);
+            player2.PopulateDeserializedNetwork();
+
+            for (int loop = 0; loop < 100000; loop++)
+            {
+                List<int> board = new List<int>() { 0, 0, 0,
+                                            0, 0, 0,
+                                            0, 0, 0 };
+
+                moveCount = 0;
+                while(true)
+                {
+                    List<double> player1Move = player1.Play(board);
+                    moveCount++;
+                    int xMove = FindMove(player1Move);
+                    Status status = EvaluatePlayerMove(xMove, x, board, out int bestMoveX);
+                    board[xMove] = x;
+
+                    if (status == Status.Lost)
+                    {
+                        List<double> errors = FindGameError(board, player1Move, bestMoveX);
+                        player1.BackPropagate(errors);
+                        lostGames++;
+                        break;
+                    }
+                    else if (status == Status.Won)
+                    {
+                        wonGames++;
+                        break;
+                    }
+
+                    if(moveCount == 9)
+                    {
+                        tieGames++;
+                        break;
+                    }
+
+                    List<double> player2Move = player2.Play(board);
+                    moveCount++;
+                    int oMove = FindMove(player2Move);
+                    status = EvaluatePlayerMove(oMove, o, board, out int bestMoveO);
+                    board[oMove] = o;
+                    if (status == Status.Lost)
+                    {
+                        List<double> errors = FindGameError(board, player2Move, bestMoveO);
+                        player2.BackPropagate(errors);
+                        lostGames++;
+                        break;
+                    }
+                    else if (status == Status.Won)
+                    {
+                        wonGames++;
+                        break;
+                    }
+                }
+            }
+            return;
+        }
+
+        Status EvaluatePlayerMove(int oMove, int player, List<int> board, out int bestMove)
+        {
+            bestMove = 0;
+            if (board[oMove] != 0)
+            {
+                for(int i = 0; i < board.Count; i++)
+                {
+                    if(board[i] == 0)
+                    {
+                        bestMove = i;
+                        break;
+                    }
+                }
+                return Status.Lost;
+            }
+
+            Status status = evaluateMove(board, oMove, player, out int bestMove2);
+            bestMove = bestMove2;
+            return status;
         }
     }
 }

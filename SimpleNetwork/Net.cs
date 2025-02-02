@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Text.Json;
+using System.Xml.Linq;
 
 namespace TicTacToe
 {
@@ -74,15 +75,32 @@ namespace TicTacToe
         public void PopulateDeserializedNetwork()
         {
             // Add Sigmoids
-            foreach (var layer in Layers)
+            for (int i = 0; i < Layers.Count; i++)
             {
-                foreach (Node node in layer.Nodes)
+                var layer = Layers[i];
+                layer.Width = layer.Nodes.Count;
+
+                for(int j = 0; j < layer.Nodes.Count; j++)
                 {
-                    node.Sigmoid = (double input) =>
+                    Node node = layer.Nodes[j];
+                    if (i == 0)
                     {
-                        // Mathematical sigmoid function
-                        return (1 / (1 + Math.Pow(Math.E, -1 * input)));
-                    };
+                        InputNode inputNode = new InputNode((double input) =>
+                        {
+                            // Mathematical sigmoid function
+                            return (1 / (1 + Math.Pow(Math.E, -1 * input)));
+                        });
+                        inputNode.ForwardNodes = node.ForwardNodes;
+                        layer.Nodes[j] = inputNode;
+                    }
+                    else
+                    {
+                        node.Sigmoid = (double input) =>
+                        {
+                            // Mathematical sigmoid function
+                            return (1 / (1 + Math.Pow(Math.E, -1 * input)));
+                        };
+                    }
                 }
                 foreach (Node node in layer.BiasInputs)
                 {

@@ -19,7 +19,7 @@ namespace TicTacToe
             Result = result;
         }
 
-        public override void CalcNode(int nodeCount)
+        public override void CalcNode(int nodeCount = 1)
         {
             // bias nodes never average and always reapply the bias
             if (double.IsNaN(Result) || double.IsInfinity(Result) || double.IsNegativeInfinity(Result))

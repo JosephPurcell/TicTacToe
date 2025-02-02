@@ -12,7 +12,7 @@ namespace TicTacToe
         public Layer()
         { }
 
-        int Width { get; set; } = 0;
+        public int Width { get; set; } = 0;
         public Layer(int width, int Bias, bool inputLayer = false)
         {
             Width = width;
@@ -54,7 +54,7 @@ namespace TicTacToe
 
         public List<Node> Nodes { get; set; } = new List<Node>();
 
-        public List<Node> BiasInputs { get; set; } = new List<Node>();
+        public List<BiasNode> BiasInputs { get; set; } = new List<BiasNode>();
 
         public void CalcLayer(int previousLayerNodeCount)
         {
